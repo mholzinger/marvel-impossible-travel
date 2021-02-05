@@ -37,6 +37,7 @@ def marvel_auth(keychain):
   authentication['ts'] = str(unix_timestamp)
   authentication['apikey'] = keychain["MARVEL_PUBKEY"]
   authentication['hash'] = md5_ciphertext
+  authentication['limit'] = 100
 
   return authentication
 
