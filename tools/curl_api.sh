@@ -11,4 +11,6 @@ curl -sGH \"Accept: application/json\" \
  "$REST_ENDPOINT" \
  -d apikey=$MARVEL_PUBKEY \
  -d ts=$ts \
- -d hash=$hash
+ -d hash=$hash \
+ -d offset=0 \
+ -d limit=100

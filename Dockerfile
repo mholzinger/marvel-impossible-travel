@@ -5,4 +5,3 @@ COPY rest.py /rest.py
 COPY .apikeys /.apikeys
 
 ENTRYPOINT ["python3", "rest.py"]
-
