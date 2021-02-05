@@ -6,7 +6,7 @@ from hashlib import md5
 
 # Static constants
 marvel_endpoint = 'https://gateway.marvel.com:443/v1/public/'
-character_name = "Ajaxis"
+character_name = "Spectrum"
 #response = requests.get(url, params=auth).json()
 #print(response)
 
@@ -47,11 +47,23 @@ def find_character_id(name):
   :return: str
   """
   url = (marvel_endpoint + 'characters')
-  character = requests.get(url, params=auth).json()
+  result = requests.get(url, params=auth).json()
    # Write some pagination magic, this is vital
-  for item in character['data']['results']:
-    if name in item['name']:
-      return item['id']
+  total_results = result['data']['total']
+  offset = result['data']['offset']
+
+  while offset < total_results:
+    result = requests.get(url, params=auth).json()
+    offset = result['data']['offset']
+    count = result['data']['count']
+
+    for item in result['data']['results']:
+      if name == item['name']:
+        return item['id']
+
+    # pagination counters
+    new_offset = (offset + count)
+    auth['offset'] = str(new_offset)
 
 def get_char_data(id):
   """
