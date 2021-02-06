@@ -52,12 +52,39 @@ def setup_db(dbname):
   c = conn.cursor()
     # Create table
   c.execute('''CREATE TABLE marvel_characters
+    (name text, id text, description text, picture_url text)''')
+  c.execute('''CREATE TABLE spectrum_associates
     (name text, id text, description text, picture_url text, picture blob)''')
   # Save (commit) the changes
   conn.commit()
   conn.close()
 
-def eval_char_data(dossier):
+def char_lookup_table(dossier):
+  """
+  Test for existing Marvel Character Data, commit if not exist
+  :param dossier: dict
+  """
+  conn = sqlite3.connect(OUR_DB)
+  c = conn.cursor()
+
+  # Look to see if data exists
+  c.execute("SELECT * FROM marvel_characters WHERE name=?", (dossier['name'],))
+  if c.fetchone() is None:
+    print ("Adding" + dossier['name'] + "to lookup table")
+
+    # Format DB commit
+    params = (dossier['name'], dossier['id'], dossier['description'],
+      dossier['picture'])
+
+    sql = ''' INSERT INTO marvel_characters(name,id,description,picture_url)
+      VALUES(?,?,?,?) '''
+
+   # Insert a row of data
+    c.execute(sql, params)
+    conn.commit()
+    conn.close()
+
+def eval_associate(dossier):
   """
   Test for existing Marvel Character Data, commit if not exist
   :param dossier: dict
@@ -136,10 +163,11 @@ def find_character_id(name):
 
       for item in result['data']['results']:
         dossier = parse_char_data(item)
-        eval_char_data(dossier)
+        char_lookup_table(dossier)
 
         if name == item['name']:
-          return item['id']
+          id = item['id']
+          return id
 
       # pagination counters
       new_offset = (offset + count)
