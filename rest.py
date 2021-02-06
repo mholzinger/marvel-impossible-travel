@@ -93,9 +93,9 @@ def eval_associate(dossier):
   c = conn.cursor()
 
   # Look to see if data exists
-  c.execute("SELECT * FROM marvel_characters WHERE name=?", (dossier['name'],))
+  c.execute("SELECT * FROM spectrum_associates WHERE name=?", (dossier['name'],))
   if c.fetchone() is None:
-    print ("adding", dossier['name'])
+    print ("Adding" + dossier['name'] + "to lookup table")
     # Download image
     response = requests.get(dossier['picture'])
 
@@ -103,10 +103,10 @@ def eval_associate(dossier):
     params = (dossier['name'], dossier['id'], dossier['description'],
       dossier['picture'], sqlite3.Binary(response.content))
 
-    sql = ''' INSERT INTO marvel_characters(name,id,description,picture_url,picture)
+    sql = ''' INSERT INTO spectrum_associates(name,id,description,picture_url,picture)
       VALUES(?,?,?,?,?) '''
 
-   # Insert a row of data
+    # Insert a row of data
     c.execute(sql, params)
     conn.commit()
     conn.close()
@@ -130,6 +130,17 @@ def parse_char_data(data):
   extension = data['thumbnail']['extension']
   dossier['picture'] = image_path + '/' + image_size + '.' + extension
 
+  return dossier
+
+def get_id_dossier(id):
+  """
+  :param id: str
+  :return: dict
+  """
+  dossier = {}
+  url=(marvel_endpoint + 'characters/' + id)
+  result = requests.get(url, params=auth).json()
+  dossier = parse_char_data(result['data']['results'][0])
   return dossier
 
 def find_character_id(name):
@@ -177,12 +188,21 @@ def find_character_id(name):
     id = data[1]
     return id
 
+def add_all_appeared_names_with_char(id):
+  """
+  Add all accociates IDs from comic appearances to 'spectrum_accociates' table
+  """
+  url = (marvel_endpoint + 'characters/' + id + '/comics')
+  result = requests.get(url, params=auth).json()
+  for collection in result['data']['results']:
+    for names in collection['characters']['items']:
+      id = find_character_id(names['name'])
+      dossier = get_id_dossier(id)
+      eval_associate(dossier)
 
 # Load keys in dictionary and then next step
 keychain = get_apikeys()
 auth = marvel_auth(keychain)
-
-import os.path
 
 if os.path.isfile(OUR_DB):
     print ("spectrum.db exists, continuing")
@@ -191,3 +211,4 @@ else:
 
 # Find suspect character by name
 id = find_character_id(suspect)
+add_all_appeared_names_with_char(id)
