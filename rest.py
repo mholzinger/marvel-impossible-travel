@@ -191,6 +191,7 @@ def find_character_id(name):
 def add_all_appeared_names_with_char(id):
   """
   Add all accociates IDs from comic appearances to 'spectrum_accociates' table
+  :param id: str
   """
   url = (marvel_endpoint + 'characters/' + id + '/comics')
   result = requests.get(url, params=auth).json()
