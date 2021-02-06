@@ -185,7 +185,7 @@ auth = marvel_auth(keychain)
 import os.path
 
 if os.path.isfile(OUR_DB):
-    print ("spctrum.db exists, continuing")
+    print ("spectrum.db exists, continuing")
 else:
     setup_db(OUR_DB)
 
