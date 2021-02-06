@@ -70,7 +70,7 @@ def char_lookup_table(dossier):
   # Look to see if data exists
   c.execute("SELECT * FROM marvel_characters WHERE name=?", (dossier['name'],))
   if c.fetchone() is None:
-    print ("Adding" + dossier['name'] + "to lookup table")
+    print ("Adding " + dossier['name'] + "to lookup table")
 
     # Format DB commit
     params = (dossier['name'], dossier['id'], dossier['description'],
@@ -193,7 +193,7 @@ def add_all_appeared_names_with_char(id):
   Add all accociates IDs from comic appearances to 'spectrum_accociates' table
   :param id: str
   """
-  url = (marvel_endpoint + 'characters/' + id + '/comics')
+  url = (marvel_endpoint + 'characters/' + str(id) + '/comics')
   result = requests.get(url, params=auth).json()
   for collection in result['data']['results']:
     for names in collection['characters']['items']:
