@@ -138,7 +138,7 @@ def get_id_dossier(id):
   :return: dict
   """
   dossier = {}
-  url=(marvel_endpoint + 'characters/' + id)
+  url=(marvel_endpoint + 'characters/' + str(id))
   result = requests.get(url, params=auth).json()
   dossier = parse_char_data(result['data']['results'][0])
   return dossier

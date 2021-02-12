@@ -1,2 +1,2 @@
-sudo docker build -t marvel .
-sudo docker run -it --rm -v `pwd`:/mnt/mydata/ marvel
+docker build -t marvel .
+docker run -it -v `pwd`:/mnt/mydata/ marvel
